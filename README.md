@@ -1,101 +1,87 @@
-# NgxNeolineProject
+# @smartargs/ngx-neoline
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+Angular service wrapper for the NeoLine N3 dAPI. Detects the injected provider, waits for READY events, and exposes typed methods for common, read, write, and event APIs.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+- Library package: `@smartargs/ngx-neoline`
+- Demo app included in this repo for local testing
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/angular-standalone-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+## Features
 
-## Run tasks
+- Typed APIs
+  - Common: `getNetworks`, `getAccount`, `getPublicKey`
+  - Read: `getProvider`, `getBalance`, `getStorage`, `invokeRead`, `invokeReadMulti`, `verifyMessageV2`, `getBlock`, `getTransaction`, `getApplicationLog`, `pickAddress`, `AddressToScriptHash`, `ScriptHashToAddress`
+  - Write: `send`, `invoke`, `invokeMultiple`, `signMessageV2`, `signMessageWithoutSaltV2`, `signTransaction`, `switchWalletNetwork`, `switchWalletAccount`
+- Events: `on(event)` Observable wrapper using provider `addEventListener`/`removeEventListener`
+- Error guard: `isNeolineError(err)` for safe narrowing of NeoLine error objects
+- Provided in root, no module setup required
 
-To run the dev server for your app, use:
+## Requirements
 
-```sh
-npx nx serve ngx-neoline-project
+- Angular >= 14
+- RxJS >= 7.5
+- NeoLine N3 browser extension (in the user’s browser)
+
+## Install
+
+```bash
+npm install @smartargs/ngx-neoline
 ```
 
-To create a production bundle:
+## Quick start
 
-```sh
-npx nx build ngx-neoline-project
+```ts
+import { Component, inject } from '@angular/core';
+import { NeolineService } from '@smartargs/ngx-neoline';
+
+@Component({ selector: 'app-demo', template: '' })
+export class DemoComponent {
+  private readonly neoline = inject(NeolineService);
+
+  async ngOnInit() {
+    const networks = await this.neoline.getNetworks();
+    console.log('chainId', networks.chainId);
+  }
+}
 ```
 
-To see all available targets to run for a project, run:
+## Events
 
-```sh
-npx nx show project ngx-neoline-project
+```ts
+const sub = neoline.on('ACCOUNT_CHANGED').subscribe((e) => console.log(e));
+// later:
+sub.unsubscribe();
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+## Error handling
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```ts
+import { isNeolineError } from '@smartargs/ngx-neoline';
 
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/angular:app demo
+try {
+  await neoline.getNetworks();
+} catch (err) {
+  if (isNeolineError(err)) {
+    console.error(err.type, err.description, err.data);
+  } else {
+    console.error(err);
+  }
+}
 ```
 
-To generate a new library, use:
+## Develop
 
-```sh
-npx nx g @nx/angular:lib mylib
-```
+- Serve demo app: `npx nx serve ngx-neoline-project`
+- Build library: `npx nx build libs`
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+## Publish
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- Build outputs to `dist/libs/`
+- `libs/ng-package.json` includes `README.md` and `LICENSE` as package assets
 
-## Set up CI!
+## License
 
-### Step 1
+MIT. NeoLine is a separate product; this package only integrates with its public dAPI.
 
-To connect to Nx Cloud, run the following command:
+## Docs
 
-```sh
-npx nx connect
-```
-
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
-```
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/angular-standalone-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+NeoLine N3 provider API: https://tutorial.neoline.io/reference/neo3-provider-api
