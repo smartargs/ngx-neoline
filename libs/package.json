@@ -1,0 +1,32 @@
+{
+  "name": "@smartargs/ngx-neoline",
+  "version": "0.0.1",
+  "description": "Angular service wrapper for the NeoLine N3 dAPI.",
+  "peerDependencies": {
+    "@angular/core": ">=14.0.0",
+    "rxjs": ">=7.5.0"
+  },
+  "keywords": [
+    "angular",
+    "neoline",
+    "neo",
+    "neo3",
+    "web3",
+    "wallet",
+    "dapi"
+  ],
+  "license": "MIT",
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "homepage": "",
+  "bugs": {
+    "url": ""
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false
+}

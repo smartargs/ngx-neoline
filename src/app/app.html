@@ -1,2 +1,54 @@
-<app-nx-welcome></app-nx-welcome>
-<router-outlet></router-outlet>
+<div style="padding: 16px">
+  <button type="button" (click)="testGetNetworks()">Test getNetworks()</button>
+  <button type="button" (click)="testGetAccount()">Test getAccount()</button>
+  <button type="button" (click)="testGetPublicKey()">
+    Test getPublicKey()
+  </button>
+  <button type="button" (click)="testGetProvider()">Test getProvider()</button>
+  <button type="button" (click)="testGetStorage()">Test getStorage()</button>
+  <button type="button" (click)="testGetBalance()">Test getBalance()</button>
+  <button type="button" (click)="testInvokeRead()">Test invokeRead()</button>
+  <button type="button" (click)="testInvokeReadMulti()">
+    Test invokeReadMulti()
+  </button>
+  <button type="button" (click)="testVerifyMessageV2()">
+    Test verifyMessageV2()
+  </button>
+  <button type="button" (click)="testGetBlock()">Test getBlock()</button>
+  <button type="button" (click)="testGetTransaction()">
+    Test getTransaction()
+  </button>
+  <button type="button" (click)="testGetApplicationLog()">
+    Test getApplicationLog()
+  </button>
+  <button type="button" (click)="testPickAddress()">Test pickAddress()</button>
+  <button type="button" (click)="testAddressToScriptHash()">
+    Test AddressToScriptHash()
+  </button>
+  <button type="button" (click)="testScriptHashToAddress()">
+    Test ScriptHashToAddress()
+  </button>
+  <button type="button" (click)="testSend()">Test send()</button>
+  <button type="button" (click)="testInvoke()">Test invoke()</button>
+  <button type="button" (click)="testInvokeMultiple()">
+    Test invokeMultiple()
+  </button>
+  <button type="button" (click)="testSignMessageV2()">
+    Test signMessageV2()
+  </button>
+  <button type="button" (click)="testSignMessageWithoutSaltV2()">
+    Test signMessageWithoutSaltV2()
+  </button>
+  <button type="button" (click)="testSignTransaction()">
+    Test signTransaction()
+  </button>
+  <button type="button" (click)="testSwitchWalletNetwork()">
+    Test switchWalletNetwork()
+  </button>
+  <button type="button" (click)="testSwitchWalletAccount()">
+    Test switchWalletAccount()
+  </button>
+  <p style="font-size: 12px; color: #666">
+    Requires NeoLine N3 extension injected on this page.
+  </p>
+</div>
