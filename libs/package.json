@@ -16,14 +16,14 @@
     "dapi"
   ],
   "license": "MIT",
-  "author": "",
+  "author": "smartargs",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/smartargs/ngx-neoline"
   },
-  "homepage": "",
+  "homepage": "https://github.com/smartargs/ngx-neoline",
   "bugs": {
-    "url": ""
+    "url": "https://github.com/smartargs/ngx-neoline/issues"
   },
   "publishConfig": {
     "access": "public"

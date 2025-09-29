@@ -1,8 +1,18 @@
 # @smartargs/ngx-neoline
 
+<p align="center">
+  <img alt="Neo" src="https://img.shields.io/badge/Neo-N3-00E599?logo=neo&logoColor=white" />
+  <a href="https://www.npmjs.com/package/@smartargs/ngx-neoline">
+    <img alt="npm" src="https://img.shields.io/npm/v/%40smartargs%2Fngx-neoline.svg?logo=npm&label=npm&color=%23CB0000" />
+  </a>
+  <img alt="license" src="https://img.shields.io/badge/license-MIT-informational" />
+  <img alt="angular" src="https://img.shields.io/badge/Angular-%3E%3D14-DD0031?logo=angular&logoColor=white" />
+</p>
+
 Angular service wrapper for the NeoLine N3 dAPI. Detects the injected provider, waits for READY events, and exposes typed methods for common, read, write, and event APIs.
 
 - Library package: `@smartargs/ngx-neoline`
+- npm: https://www.npmjs.com/package/@smartargs/ngx-neoline
 - Demo app included in this repo for local testing
 
 ## Features
@@ -48,8 +58,6 @@ export class DemoComponent {
 
 ```ts
 const sub = neoline.on('ACCOUNT_CHANGED').subscribe((e) => console.log(e));
-// later:
-sub.unsubscribe();
 ```
 
 ## Error handling
