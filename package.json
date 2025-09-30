@@ -5,6 +5,8 @@
   "scripts": {
     "start": "nx serve",
     "build": "nx build",
+    "build:libs": "nx build libs",
+    "publish:libs": "nx run-many -t nx-release-publish",
     "test": "nx test"
   },
   "private": true,

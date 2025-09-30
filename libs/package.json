@@ -1,6 +1,6 @@
 {
   "name": "@smartargs/ngx-neoline",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Angular service wrapper for the NeoLine N3 dAPI.",
   "peerDependencies": {
     "@angular/core": ">=14.0.0",

@@ -108,7 +108,8 @@ export type ArgumentType =
   | 'Address';
 
 export type Argument =
-  | { type: Exclude<ArgumentType, 'Array'>; value: string }
+  | { type: 'Boolean'; value: boolean }
+  | { type: Exclude<ArgumentType, 'Array' | 'Boolean'>; value: string }
   | { type: 'Array'; value: Argument[] };
 
 export interface WitnessRuleBase<T extends string> {
