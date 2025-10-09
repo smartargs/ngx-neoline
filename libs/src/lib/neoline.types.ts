@@ -94,7 +94,7 @@ export interface GetBalanceItem {
   contract: string;
 }
 
-export type GetBalanceResponse = GetBalanceItem[];
+export type GetBalanceResponse = { [address: string]: GetBalanceItem[] };
 
 // ===== invokeRead types =====
 export type ArgumentType =
