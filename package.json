@@ -7,7 +7,16 @@
     "build": "nx build",
     "build:libs": "nx build libs",
     "publish:libs": "nx run-many -t nx-release-publish",
-    "test": "nx test"
+    "test": "nx test",
+    "version:lib:patch": "npm --prefix libs version patch -m \"chore(release): %s\"",
+    "version:lib:minor": "npm --prefix libs version minor -m \"chore(release): %s\"",
+    "version:lib:major": "npm --prefix libs version major -m \"chore(release): %s\"",
+    "publish:lib": "npm run build:libs && npm --prefix dist/libs publish --access public",
+    "tag:lib": "git tag v$(node -p \"require('./libs/package.json').version\")",
+    "push:tags": "git push && git push --tags",
+    "release:lib:patch": "npm run version:lib:patch && npm run publish:lib && npm run push:tags",
+    "release:lib:minor": "npm run version:lib:minor && npm run publish:lib && npm run push:tags",
+    "release:lib:major": "npm run version:lib:major && npm run publish:lib && npm run push:tags"
   },
   "private": true,
   "dependencies": {

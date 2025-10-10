@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, InjectionToken, inject } from '@angular/core';
 import { Observable, ReplaySubject, firstValueFrom } from 'rxjs';
 import type {
   GetNetworksResponse,
@@ -46,10 +46,43 @@ import type {} from './global';
 const NEO_READY_EVENT = 'NEOLine.NEO.EVENT.READY';
 const N3_READY_EVENT = 'NEOLine.N3.EVENT.READY';
 
+export const NEOLINE_DEBUG_LOGS = new InjectionToken<boolean>(
+  'NEOLINE_DEBUG_LOGS',
+  { providedIn: 'root', factory: () => false }
+);
+
 @Injectable({ providedIn: 'root' })
 export class NeolineService {
   private readonly neoSubject = new ReplaySubject<unknown>(1);
   private readonly n3Subject = new ReplaySubject<NeolineN3Provider>(1);
+  private readonly debugEnabled = inject(NEOLINE_DEBUG_LOGS);
+
+  private debug(method: string, ...args: unknown[]): void {
+    if (this.debugEnabled) {
+      console.debug('[NeolineService]', method, ...args);
+    }
+  }
+
+  private logError(method: string, err: unknown): void {
+    console.error('[NeolineService]', method, err);
+  }
+
+  private async call<T>(
+    method: string,
+    args: unknown[],
+    fn: (n3: NeolineN3Provider) => Promise<T>
+  ): Promise<T> {
+    this.debug(`${method}:start`, ...args);
+    try {
+      const n3 = await this.getNeolineN3();
+      const result = await fn(n3);
+      this.debug(`${method}:success`, result);
+      return result;
+    } catch (err) {
+      this.logError(`${method}:fail`, err);
+      throw err;
+    }
+  }
 
   constructor() {
     this.initializeEventListeners();
@@ -64,167 +97,193 @@ export class NeolineService {
   }
 
   async getNeoline(): Promise<unknown> {
-    return firstValueFrom(this.neoline$);
+    this.debug('getNeoline:start');
+    try {
+      const instance = await firstValueFrom(this.neoline$);
+      this.debug('getNeoline:success');
+      return instance;
+    } catch (err) {
+      this.logError('getNeoline:fail', err);
+      throw err;
+    }
   }
 
   async getNeolineN3(): Promise<NeolineN3Provider> {
-    return firstValueFrom(this.neolineN3$);
+    this.debug('getNeolineN3:start');
+    try {
+      const instance = await firstValueFrom(this.neolineN3$);
+      this.debug('getNeolineN3:success');
+      return instance;
+    } catch (err) {
+      this.logError('getNeolineN3:fail', err);
+      throw err;
+    }
   }
 
   async getNetworks(): Promise<GetNetworksResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.getNetworks();
+    return this.call('getNetworks', [], (n3) => n3.getNetworks());
   }
 
   async getAccount(): Promise<GetAccountResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.getAccount();
+    return this.call('getAccount', [], (n3) => n3.getAccount());
   }
 
   async getPublicKey(): Promise<GetPublicKeyResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.getPublicKey();
+    return this.call('getPublicKey', [], (n3) => n3.getPublicKey());
   }
 
   async getProvider(): Promise<GetProviderResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.getProvider();
+    return this.call('getProvider', [], (n3) => n3.getProvider());
   }
 
   async getStorage(params: GetStorageParams): Promise<GetStorageResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.getStorage(params);
+    return this.call('getStorage', [params], (n3) => n3.getStorage(params));
   }
 
   async getBalance(): Promise<GetBalanceResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.getBalance();
+    return this.call('getBalance', [], (n3) => n3.getBalance());
   }
 
   async invokeRead(params: InvokeReadParams): Promise<InvokeReadResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.invokeRead(params);
+    return this.call('invokeRead', [params], (n3) => n3.invokeRead(params));
   }
 
   async invokeReadMulti(
     params: InvokeReadMultiParams
   ): Promise<InvokeReadMultiResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.invokeReadMulti(params);
+    return this.call('invokeReadMulti', [params], (n3) =>
+      n3.invokeReadMulti(params)
+    );
   }
 
   async verifyMessageV2(
     params: VerifyMessageV2Params
   ): Promise<VerifyMessageV2Response> {
-    const n3 = await this.getNeolineN3();
-    return n3.verifyMessageV2(params);
+    return this.call('verifyMessageV2', [params], (n3) =>
+      n3.verifyMessageV2(params)
+    );
   }
 
   async getBlock(params: GetBlockParams): Promise<GetBlockResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.getBlock(params);
+    return this.call('getBlock', [params], (n3) => n3.getBlock(params));
   }
 
   async getTransaction(
     params: GetTransactionParams
   ): Promise<GetTransactionResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.getTransaction(params);
+    return this.call('getTransaction', [params], (n3) =>
+      n3.getTransaction(params)
+    );
   }
 
   async getApplicationLog(
     params: GetApplicationLogParams
   ): Promise<GetApplicationLogResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.getApplicationLog(params);
+    return this.call('getApplicationLog', [params], (n3) =>
+      n3.getApplicationLog(params)
+    );
   }
 
   async pickAddress(): Promise<PickAddressResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.pickAddress();
+    return this.call('pickAddress', [], (n3) => n3.pickAddress());
   }
 
   async addressToScriptHash(
     params: AddressToScriptHashParams
   ): Promise<AddressToScriptHashResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.AddressToScriptHash(params);
+    return this.call('AddressToScriptHash', [params], (n3) =>
+      n3.AddressToScriptHash(params)
+    );
   }
 
   async scriptHashToAddress(
     params: ScriptHashToAddressParams
   ): Promise<ScriptHashToAddressResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.ScriptHashToAddress(params);
+    return this.call('ScriptHashToAddress', [params], (n3) =>
+      n3.ScriptHashToAddress(params)
+    );
   }
 
   async send(params: SendParams): Promise<SendResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.send(params);
+    return this.call('send', [params], (n3) => n3.send(params));
   }
 
   async invoke(params: InvokeParams): Promise<InvokeResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.invoke(params);
+    return this.call('invoke', [params], (n3) => n3.invoke(params));
   }
 
   async invokeMultiple(params: InvokeMultipleParams): Promise<InvokeResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.invokeMultiple(params);
+    return this.call('invokeMultiple', [params], (n3) =>
+      n3.invokeMultiple(params)
+    );
   }
 
   async signMessageV2(
     params: SignMessageV2Params
   ): Promise<SignMessageV2Response> {
-    const n3 = await this.getNeolineN3();
-    return n3.signMessageV2(params);
+    return this.call('signMessageV2', [params], (n3) =>
+      n3.signMessageV2(params)
+    );
   }
 
   async signMessageWithoutSaltV2(
     params: SignMessageWithoutSaltV2Params
   ): Promise<SignMessageWithoutSaltV2Response> {
-    const n3 = await this.getNeolineN3();
-    return n3.signMessageWithoutSaltV2(params);
+    return this.call('signMessageWithoutSaltV2', [params], (n3) =>
+      n3.signMessageWithoutSaltV2(params)
+    );
   }
 
   async signTransaction(
     params: SignTransactionParams
   ): Promise<SignTransactionResponse> {
-    const n3 = await this.getNeolineN3();
-    return n3.signTransaction(params);
+    return this.call('signTransaction', [params], (n3) =>
+      n3.signTransaction(params)
+    );
   }
 
   async switchWalletNetwork(params: SwitchWalletNetworkParams): Promise<null> {
-    const n3 = await this.getNeolineN3();
-    return n3.switchWalletNetwork(params);
+    return this.call('switchWalletNetwork', [params], (n3) =>
+      n3.switchWalletNetwork(params)
+    );
   }
 
   async switchWalletAccount(): Promise<null> {
-    const n3 = await this.getNeolineN3();
-    return n3.switchWalletAccount();
+    return this.call('switchWalletAccount', [], (n3) =>
+      n3.switchWalletAccount()
+    );
   }
 
   on<E extends CommonEventName>(
     event: E
   ): Observable<CommonEventPayloadMap[E]> {
     return new Observable<CommonEventPayloadMap[E]>((subscriber) => {
+      this.debug('on:subscribe:start', String(event));
       let provider: NeolineN3Provider | undefined;
-      const handler = (payload: CommonEventPayloadMap[E]) =>
+      const handler = (payload: CommonEventPayloadMap[E]) => {
+        this.debug('on:event', String(event), payload);
         subscriber.next(payload);
+      };
 
       this.getNeolineN3()
         .then((n3) => {
           provider = n3;
+          this.debug('on:listener:added', String(event));
           n3.addEventListener(event, handler);
         })
-        .catch((err) => subscriber.error(err));
+        .catch((err) => {
+          this.logError('on:subscribe:fail', err);
+          subscriber.error(err);
+        });
 
       return () => {
+        this.debug('on:unsubscribe', String(event));
         if (provider) {
           try {
             provider.removeEventListener(event, handler);
-          } catch {
-            // ignore
+            this.debug('on:listener:removed', String(event));
+          } catch (err) {
+            this.logError('on:unsubscribe:fail', err);
           }
         }
       };
@@ -233,6 +292,7 @@ export class NeolineService {
 
   private initializeEventListeners(): void {
     if (typeof window === 'undefined') {
+      this.debug('init:skipped:ssr');
       return;
     }
 
@@ -243,8 +303,13 @@ export class NeolineService {
         const instance = new w.NEOLine.Init();
         if (instance) {
           this.neoSubject.next(instance);
+          this.debug('init:NEOLine:injected');
         } else {
           this.neoSubject.error(
+            new Error('common dAPI method failed to load.')
+          );
+          this.logError(
+            'init:NEOLine:injected:fail',
             new Error('common dAPI method failed to load.')
           );
         }
@@ -253,11 +318,17 @@ export class NeolineService {
         const instanceN3 = new w.NEOLineN3.Init();
         if (instanceN3) {
           this.n3Subject.next(instanceN3);
+          this.debug('init:NEOLineN3:injected');
         } else {
           this.n3Subject.error(new Error('N3 dAPI method failed to load.'));
+          this.logError(
+            'init:NEOLineN3:injected:fail',
+            new Error('N3 dAPI method failed to load.')
+          );
         }
       }
-    } catch {
+    } catch (err) {
+      this.debug('init:injected-check:error', err);
       // Ignore and rely on events below
     }
 
@@ -268,20 +339,29 @@ export class NeolineService {
           this.neoSubject.error(
             new Error('NEOLine Init not available on READY event.')
           );
+          this.logError(
+            'NEO_READY_EVENT:Init:missing',
+            new Error('NEOLine Init not available on READY event.')
+          );
           return;
         }
         const neoline = new w.NEOLine.Init();
         if (neoline) {
           this.neoSubject.next(neoline);
+          this.debug('NEO_READY_EVENT:provider:ready');
         } else {
           this.neoSubject.error(
             new Error('common dAPI method failed to load.')
           );
+          this.logError(
+            'NEO_READY_EVENT:provider:fail',
+            new Error('common dAPI method failed to load.')
+          );
         }
       } catch (err) {
-        this.neoSubject.error(
-          err instanceof Error ? err : new Error(String(err))
-        );
+        const e = err instanceof Error ? err : new Error(String(err));
+        this.neoSubject.error(e);
+        this.logError('NEO_READY_EVENT:handler:error', e);
       }
     });
 
@@ -292,18 +372,27 @@ export class NeolineService {
           this.n3Subject.error(
             new Error('NEOLineN3 Init not available on READY event.')
           );
+          this.logError(
+            'N3_READY_EVENT:Init:missing',
+            new Error('NEOLineN3 Init not available on READY event.')
+          );
           return;
         }
         const neolineN3 = new w.NEOLineN3.Init();
         if (neolineN3) {
           this.n3Subject.next(neolineN3);
+          this.debug('N3_READY_EVENT:provider:ready');
         } else {
           this.n3Subject.error(new Error('N3 dAPI method failed to load.'));
+          this.logError(
+            'N3_READY_EVENT:provider:fail',
+            new Error('N3 dAPI method failed to load.')
+          );
         }
       } catch (err) {
-        this.n3Subject.error(
-          err instanceof Error ? err : new Error(String(err))
-        );
+        const e = err instanceof Error ? err : new Error(String(err));
+        this.n3Subject.error(e);
+        this.logError('N3_READY_EVENT:handler:error', e);
       }
     });
   }
