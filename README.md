@@ -54,6 +54,26 @@ export class DemoComponent {
 }
 ```
 
+## Enable debug logs
+
+Expose structured debug logs from the service by providing a config flag at bootstrap (or feature-level providers).
+
+```ts
+// main.ts or app.config.ts
+import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app';
+import { provideNeolineDebug } from '@smartargs/ngx-neoline';
+
+bootstrapApplication(AppComponent, {
+  providers: [provideNeolineDebug(true)], // set false to disable
+});
+```
+
+Notes:
+
+- Errors are always logged; debug logs are gated by the flag above.
+- Ensure your browser console level is set to "Verbose" to see `console.debug` output.
+
 ## Events
 
 ```ts
