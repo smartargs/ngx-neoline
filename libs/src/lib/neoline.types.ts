@@ -224,19 +224,84 @@ export interface GetBlockParams {
   blockHashOrIndex: string | number;
 }
 
-export type GetBlockResponse = unknown;
+export interface RpcWitness {
+  invocation: string;
+  verification: string;
+}
+
+export interface GetBlockResponse {
+  hash: string;
+  size: number;
+  version: number;
+  previousblockhash: string | null;
+  merkleroot: string;
+  time: number;
+  index: number;
+  primary: number;
+  nextconsensus: string;
+  witnesses: RpcWitness[];
+  tx: GetTransactionResponse[];
+  confirmations: number;
+  nextblockhash?: string | null;
+}
 
 export interface GetTransactionParams {
   txid: string;
 }
 
-export type GetTransactionResponse = unknown;
+export interface TransactionTransfer {
+  hash: string;
+  src: string;
+  contract: string;
+  from: string;
+  to: string;
+  amount: string;
+}
+
+export interface GetTransactionResponse {
+  hash: string;
+  size: number;
+  sys_fee: string;
+  net_fee: string;
+  block_index: number;
+  block_time: number;
+  version: number;
+  transfers: TransactionTransfer[];
+}
 
 export interface GetApplicationLogParams {
   txid: string;
 }
 
-export type GetApplicationLogResponse = unknown;
+export type VmStackItem =
+  | { type: 'Any' }
+  | { type: 'Boolean'; value: boolean }
+  | { type: 'Integer'; value: string }
+  | { type: 'ByteString'; value: string }
+  | { type: 'Buffer'; value: string }
+  | { type: 'Array'; value: VmStackItem[] }
+  | { type: 'Struct'; value: VmStackItem[] }
+  | { type: 'Map'; value: { key: VmStackItem; value: VmStackItem }[] }
+  | { type: 'InteropInterface' };
+
+export interface ApplicationNotification {
+  contract: string;
+  eventname: string;
+  state: VmStackItem;
+}
+
+export interface ApplicationExecution {
+  trigger: 'OnPersist' | 'PostPersist' | 'Application';
+  vmstate: 'HALT' | 'FAULT';
+  gasconsumed: string;
+  stack: VmStackItem[];
+  notifications: ApplicationNotification[];
+}
+
+export interface GetApplicationLogResponse {
+  blockhash: string;
+  executions: ApplicationExecution[];
+}
 
 export interface PickAddressResponse {
   label: string;
@@ -339,7 +404,7 @@ export interface TransactionLike {
   validUntilBlock: number;
   attributes: unknown[];
   signers: Array<{ account: string; scopes: number }>;
-  witnesses: unknown[];
+  witnesses: { invocationScript: string; verificationScript: string }[];
   script: string;
 }
 
